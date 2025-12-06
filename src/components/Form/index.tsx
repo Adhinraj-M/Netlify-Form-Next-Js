@@ -9,25 +9,26 @@ export const CustomForm = () => {
   const { register, handleSubmit, reset } = useForm<ContactUs>({
     resolver: zodResolver(ContactUsFormSchema),
   });
+  const onContactFormSubmit = async (data: ContactUs) => {
+    const formFields: Record<string, string> = {
+      "form-name": "contact-us",
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      projectDescription: data.projectDescription,
+    };
 
-  const onContactFormSubmit = (data: ContactUs) => {
-    const formData = new FormData();
-
-    formData.append("form-name", "contact-us");
-    formData.append("firstName", data.firstName);
-    formData.append("lastName", data.lastName);
-    formData.append("email", data.email);
-    if (data.phoneNumber !== undefined) {
-      formData.append("phoneNumber", data.phoneNumber);
+    if (data.phoneNumber) {
+      formFields.phoneNumber = data.phoneNumber;
     }
-    formData.append("projectDescription", data.projectDescription);
 
-    fetch("/", {
+    await fetch("/contact-us.html", {
       method: "POST",
-      body: formData,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formFields).toString(),
     })
       .then(() => {
-        console.log("then", formData);
+        console.log("successfully");
         reset();
       })
       .catch((err) => console.log(err));
